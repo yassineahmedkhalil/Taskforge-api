@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,26 @@ namespace TaskForgeApi.Controllers
         return BadRequest("Invalid username or password.");
       }
       return Ok(token);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult AuthenticatedOnlyEndpoint()
+    {
+        return Ok("You are authenticated!");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin-only")]
+    public IActionResult AdminOnlyEndpoint()
+    {
+        return Ok("You are an admin!");
+    }
+
+    [HttpGet("getUsers")]
+    public async Task<List<User>> getUsers()
+    {
+        return await authService.getUsers();
     }
   }
 }
