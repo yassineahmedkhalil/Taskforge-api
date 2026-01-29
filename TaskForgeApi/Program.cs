@@ -15,6 +15,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<UserDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
     AddJwtBearer(options =>
     {
