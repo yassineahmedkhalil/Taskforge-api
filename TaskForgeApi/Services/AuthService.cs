@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,9 +14,12 @@ namespace TaskForgeApi.Services
 {
     public class AuthService(UserDbContext context, ITokenProvider tokenProvider) : IAuthService
     {
-        public async Task<TokenResponseDto?> LoginAsync(UserDto request)
+        public async Task<TokenResponseDto?> LoginAsync(LoginDto request)
         {
-            var user = context.Users.FirstOrDefault(u => u.Username == request.Username);
+            var user = context.Users.FirstOrDefault(u =>
+              u.Username == request.Username || 
+              u.Email == request.Username
+            );
             if (user == null)
             {
                 return null;
@@ -28,7 +32,7 @@ namespace TaskForgeApi.Services
             return await tokenProvider.CreateTokenResponse(user);
         }
 
-        public async Task<User?> RegisterAsync(UserDto request)
+        public async Task<User?> RegisterAsync(RegisterDto request)
         {
             if (await context.Users.AnyAsync(u => u.Username == request.Username))
             {
@@ -38,6 +42,7 @@ namespace TaskForgeApi.Services
             var user = new User();
 
             var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
+            user.Email = request.Email;
             user.Username = request.Username;
             user.PasswordHash = hashedPassword;
 

@@ -17,7 +17,7 @@ namespace TaskForgeApi.Controllers
   public class AuthController(IAuthService authService) : ControllerBase
   {
     [HttpPost("register")]
-    public async Task<ActionResult<User>> Register(UserDto request)
+    public async Task<ActionResult<User>> Register(RegisterDto request)
     {
       var user = await authService.RegisterAsync(request);
       if (user is null)
@@ -27,7 +27,7 @@ namespace TaskForgeApi.Controllers
       return Ok(user);
     }
     [HttpPost("login")]
-    public async Task<ActionResult<TokenResponseDto>> LoginAsync(UserDto request)
+    public async Task<ActionResult<TokenResponseDto>> LoginAsync(LoginDto request)
     {
       var result = await authService.LoginAsync(request);
       if (result is null)

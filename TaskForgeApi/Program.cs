@@ -16,6 +16,15 @@ builder.Services.AddDbContext<UserDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")  // Angular
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
     AddJwtBearer(options =>
     {
@@ -41,6 +50,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AngularDev");
 app.UseAuthentication();
 
 app.UseAuthorization();
