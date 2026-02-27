@@ -34,13 +34,7 @@ namespace TaskForgeApi.Services
 
         public async Task<User?> RegisterAsync(RegisterDto request)
         {
-            if (await context.Users.AnyAsync(u => u.Username == request.Username))
-            {
-                return null;
-            }
-
             var user = new User();
-
             var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
             user.Email = request.Email;
             user.Username = request.Username;
@@ -54,6 +48,15 @@ namespace TaskForgeApi.Services
         public async Task<List<User>> getUsers()
         {
             return await context.Users.ToListAsync();
+        }
+        public Task<bool> isUsernameExistsAsync(RegisterDto request)
+        {
+            return context.Users.AnyAsync(u => u.Username == request.Username);
+        }
+
+        public Task<bool> isEmailExistsAsync(RegisterDto request)
+        {
+            return context.Users.AnyAsync(u => u.Email == request.Email);
         }
 
         public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request)

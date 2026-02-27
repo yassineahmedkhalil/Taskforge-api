@@ -19,12 +19,33 @@ namespace TaskForgeApi.Controllers
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(RegisterDto request)
     {
-      var user = await authService.RegisterAsync(request);
-      if (user is null)
-      {
-            return BadRequest("Username already exists.");
+        var emailExists = await authService.isEmailExistsAsync(request);
+        var usernameExists = await authService.isUsernameExistsAsync(request);
+
+        if (emailExists || usernameExists)
+        {
+
+        var errors = new Dictionary<string, string[]> {};
+            if(emailExists)
+            {
+                errors["email"] = new[] { "Email is already in use" }; 
+            }
+            if(usernameExists)
+            {
+                errors["username"] = new[] { "Username is already in use" };
+            }
+
+        return Conflict(new ValidationProblemDetails(errors)
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "Registration conflict",
+            Detail = "One or more validation errors occurred.",
+            Instance = HttpContext.Request.Path
+        });
       }
-      return Ok(user);
+      var user = await authService.RegisterAsync(request);
+
+      return Created("", user);
     }
     [HttpPost("login")]
     public async Task<ActionResult<TokenResponseDto>> LoginAsync(LoginDto request)
