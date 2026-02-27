@@ -9,5 +9,7 @@ namespace TaskForgeApi.Services
     Task<TokenResponseDto?> LoginAsync(LoginDto request);
     Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request);
     Task<List<User>> getUsers();
-  }
+    Task<bool> isEmailExistsAsync(RegisterDto request);
+    Task<bool> isUsernameExistsAsync(RegisterDto request);
+    }
 }
