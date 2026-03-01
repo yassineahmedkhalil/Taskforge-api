@@ -45,16 +45,16 @@ namespace TaskForgeApi.Services
             return user;
         }
 
-        public async Task<List<User>> getUsers()
+        public async Task<List<User>> GetUsersAsync()
         {
             return await context.Users.ToListAsync();
         }
-        public Task<bool> isUsernameExistsAsync(RegisterDto request)
+        public Task<bool> IsUsernameExistsAsync(RegisterDto request)
         {
             return context.Users.AnyAsync(u => u.Username == request.Username);
         }
 
-        public Task<bool> isEmailExistsAsync(RegisterDto request)
+        public Task<bool> IsEmailExistsAsync(RegisterDto request)
         {
             return context.Users.AnyAsync(u => u.Email == request.Email);
         }
