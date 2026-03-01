@@ -1,11 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using TaskForgeApi.Entities;
 using TaskForgeApi.Models;
 using TaskForgeApi.Services;
@@ -19,8 +13,8 @@ namespace TaskForgeApi.Controllers
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(RegisterDto request)
     {
-        var emailExists = await authService.isEmailExistsAsync(request);
-        var usernameExists = await authService.isUsernameExistsAsync(request);
+        var emailExists = await authService.IsEmailExistsAsync(request);
+        var usernameExists = await authService.IsUsernameExistsAsync(request);
 
         if (emailExists || usernameExists)
         {
@@ -45,7 +39,7 @@ namespace TaskForgeApi.Controllers
       }
       var user = await authService.RegisterAsync(request);
 
-      return Created("", user);
+      return Ok(user);
     }
     [HttpPost("login")]
     public async Task<ActionResult<TokenResponseDto>> LoginAsync(LoginDto request)
@@ -53,7 +47,12 @@ namespace TaskForgeApi.Controllers
       var result = await authService.LoginAsync(request);
       if (result is null)
       {
-        return BadRequest("Invalid username or password.");
+        return Unauthorized(new ProblemDetails
+        {
+            Title = "Unauthorized",
+            Status = StatusCodes.Status401Unauthorized,
+            Detail = "Invalid credentials"
+        });
       }
       return Ok(result);
     }
@@ -63,7 +62,12 @@ namespace TaskForgeApi.Controllers
     {
         var result = await authService.RefreshTokenAsync(request);
         if (result is null || result.AccessToken is null || result.RefreshToken is null)
-            return Unauthorized("Invalid refresh token.");
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Unauthorized",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "Invalid refresh token"
+            });
         return Ok(result);
     }
 
@@ -82,9 +86,9 @@ namespace TaskForgeApi.Controllers
     }
 
     [HttpGet("getUsers")]
-    public async Task<List<User>> getUsers()
+    public async Task<List<User>> GetUsersAsync()
     {
-        return await authService.getUsers();
+        return await authService.GetUsersAsync();
     }
   }
 }
